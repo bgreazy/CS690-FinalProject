@@ -1,4 +1,4 @@
-﻿namespace PowerApp;
+﻿namespace PowerUsageApp;
 
 class Program
 {
