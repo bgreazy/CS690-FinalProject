@@ -4,9 +4,30 @@ namespace PowerUsageApp
 {
     public class Menu
     {
-        private EnergyTracker tracker = new EnergyTracker();
+        private DataStorage storage;
+        private EnergyTracker tracker;
         private GoalManager goalManager = new GoalManager();
         private RecommendationEngine engine = new RecommendationEngine();
+        
+
+
+
+        public Menu()
+        {
+            string filePath = "energyData.json";
+            storage = new DataStorage(filePath); 
+            tracker = new EnergyTracker(); 
+
+            // Load existing data into tracker
+            List<EnergyData> loadedRecords = storage.LoadData();
+            if (loadedRecords != null)
+            {
+                foreach (var record in loadedRecords)
+                {
+                    tracker.AddEntry(record);
+                }
+            }
+        }
 
         public void DisplayMenu()
         {
@@ -64,23 +85,58 @@ namespace PowerUsageApp
             Console.WriteLine("================================");
             Console.WriteLine("Add Energy Data");
             Console.WriteLine("================================");
+
             Console.Write("Enter the date (yyyy-MM-dd): ");
-            DateTime date = DateTime.Parse(Console.ReadLine());
+            if (!DateTime.TryParse(Console.ReadLine(), out DateTime date))
+            {
+                Console.WriteLine("Invalid date format. Please enter a valid date (yyyy-MM-dd).");
+                return;
+            }
+
             Console.Write("Enter energy usage (kWh): ");
-            double usage = double.Parse(Console.ReadLine());
-            Console.Write("Enter cost ($): ");
-            double cost = double.Parse(Console.ReadLine());
+            if (!double.TryParse(Console.ReadLine(), out double usage) || usage <= 0)
+            {
+                Console.WriteLine("Invalid input. Please enter a positive numeric value for usage.");
+                return;
+            }
+
+            Console.Write("Enter cost per kWh ($): ");
+            if (!double.TryParse(Console.ReadLine(), out double cost) || cost <= 0)
+            {
+                Console.WriteLine("Invalid input. Please enter a positive numeric value.");
+                return;
+            }
+
+            // Debugging check: Print tracker instance
+            Console.WriteLine($"Debug: tracker is {(tracker == null ? "NULL" : "OK")}");
 
             EnergyData data = new EnergyData(date, usage, cost);
-            if (data.ValidateData())
+            tracker.AddEntry(data);
+
+            // Debugging check: Print storage instance
+            Console.WriteLine($"Debug: storage is {(storage == null ? "NULL" : "OK")}");
+
+            // Retrieve all records before saving
+            List<EnergyData> allRecords = tracker.GetAllRecords();
+
+            // Debugging check: Print allRecords instance
+            Console.WriteLine($"Debug: allRecords is {(allRecords == null ? "NULL" : $"OK ({allRecords.Count} records)")}");
+
+            if (storage == null)
             {
-                tracker.AddEntry(data);
-                Console.WriteLine("Energy data added successfully!");
+                Console.WriteLine("Error: storage is null. Cannot save data.");
+                return;
             }
-            else
+
+            if (allRecords == null)
             {
-                Console.WriteLine("Invalid data entered. Please try again.");
+                Console.WriteLine("Error: allRecords is null.");
+                return;
             }
+
+            // Save data after confirming storage is initialized
+            storage.SaveData(allRecords);
+            Console.WriteLine("Energy data saved successfully!");
         }
 
         private void ViewInsights()
@@ -90,6 +146,7 @@ namespace PowerUsageApp
             Console.WriteLine("================================");
             // Implement logic to retrieve and display insights using EnergyTracker
             tracker.DisplayInsights(); // Placeholder method
+            
         }
 
         private void SetEnergyGoals()

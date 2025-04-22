@@ -5,9 +5,9 @@ namespace PowerUsageApp
     public class EnergyData
     {
         // Attributes
-        public DateTime Date { get; set; }   // Date of the energy usage entry
+        public DateTime Date { get; set; }   // Date for energy usage entry
         public double Usage { get; set; }   // Energy usage in kWh
-        public double Cost { get; set; }    // Cost of the energy usage in dollars
+        public double Cost { get; set; }    // Cost for energy usage in dollars
 
         // Constructor
         public EnergyData(DateTime date, double usage, double cost)

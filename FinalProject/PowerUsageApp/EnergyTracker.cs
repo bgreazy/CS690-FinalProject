@@ -48,7 +48,7 @@ namespace PowerUsageApp
             Console.WriteLine($"Number of records: {Records.Count}");
 
             // Display usage, cost, and total for each record
-            Console.WriteLine("Usage, Cost, and Total Cost Per Record:");
+            // Console.WriteLine("Usage, Cost, and Total Cost Per Record:");
             foreach (var record in Records)
             {
                 double total = record.Usage * record.Cost; // Calculate total for the record
