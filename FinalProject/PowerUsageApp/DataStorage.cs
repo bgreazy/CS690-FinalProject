@@ -8,13 +8,11 @@ namespace PowerUsageApp
     public class DataStorage
     {
         private readonly string filePath;
-
         
         public DataStorage(string filePath)
         {
             this.filePath = filePath;
         }
-
         
         public void SaveData(List<EnergyData> records)
         {
@@ -33,19 +31,19 @@ namespace PowerUsageApp
             }
         }
         
-public List<EnergyData> LoadData()
-{
-    if (!File.Exists(filePath))
-    {
-        Console.WriteLine("No existing data found. Starting fresh.");
-        return new List<EnergyData>();
-    }
+        public List<EnergyData> LoadData()
+        {
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine("No existing data found. Starting fresh.");
+                return new List<EnergyData>();
+            }
 
-    string json = File.ReadAllText(filePath);
+            string json = File.ReadAllText(filePath);
 
-    
-    return Newtonsoft.Json.JsonConvert.DeserializeObject<List<EnergyData>>(json) ?? new List<EnergyData>();
-}
+            
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<EnergyData>>(json) ?? new List<EnergyData>();
+        }
         
     }
 }

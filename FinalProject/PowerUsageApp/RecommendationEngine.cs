@@ -4,8 +4,7 @@ using System.Collections.Generic;
 namespace PowerUsageApp
 {
     public class RecommendationEngine
-    {
-        // Method to display general energy-saving tips
+    {        
         public void DisplayGeneralTips()
         {
             Console.WriteLine("================================");
@@ -18,8 +17,7 @@ namespace PowerUsageApp
                 Console.WriteLine($"- {tip}");
             }
         }
-
-        // Method to display custom recommendations based on data
+        
         public void DisplayCustomTips(EnergyData recentData)
         {
             Console.WriteLine("================================");
