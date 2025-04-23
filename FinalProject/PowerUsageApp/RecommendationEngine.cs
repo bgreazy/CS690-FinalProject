@@ -28,20 +28,19 @@ namespace PowerUsageApp
 
             List<string> customTips = GetCustomTips(recentData);
 
-            if (customTips.Count == 0)
+            if (recentData.Usage > 50) // Example threshold for high usage
             {
-                Console.WriteLine("No custom recommendations available based on recent energy data.");
+                Console.WriteLine("- Your recent energy usage is quite high! Consider adjusting appliance usage or investing in energy-efficient devices.");
             }
-            else
-            {
-                foreach (string tip in customTips)
-                {
-                    Console.WriteLine($"- {tip}");
-                }
-            }
-        }
 
-        // Private method to return general tips
+            if (recentData.Cost / recentData.Usage > 0.20) // Example threshold for high cost per kWh
+            {
+                Console.WriteLine("- Your cost per kWh is above average. Check for better energy rate plans.");
+            }
+
+            Console.WriteLine("- Try using smart thermostats or automated energy-saving tools for optimization.");
+        }
+        
         private List<string> GetGeneralTips()
         {
             return new List<string>
@@ -54,12 +53,11 @@ namespace PowerUsageApp
             };
         }
 
-        // Private method to return custom tips based on recent energy data
         private List<string> GetCustomTips(EnergyData data)
         {
             List<string> tips = new List<string>();
 
-            // Analyze energy usage and provide targeted tips
+            
             if (data.Usage > 50)
             {
                 tips.Add("Consider upgrading appliances to energy-efficient models.");
