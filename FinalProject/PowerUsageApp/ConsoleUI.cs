@@ -6,23 +6,26 @@ namespace PowerUsageApp
     {
         private DataStorage storage;
         private EnergyTracker tracker;
-        private GoalManager goalManager = new GoalManager();
+        private GoalManager goalManager;
         private RecommendationEngine engine = new RecommendationEngine();
         
 
 
 
-        public Menu()
+        public Menu(GoalManager goalManager)
         {
-            string filePath = "energyData.json";
-            storage = new DataStorage(filePath); 
-            tracker = new EnergyTracker(); 
+            this.goalManager = goalManager;
 
-            // Load existing data into tracker
+            string filePath = "energyData.json";  
+            tracker = new EnergyTracker(filePath); 
+
+            DataStorage storage = new DataStorage(filePath);
+            
+            
             List<EnergyData> loadedRecords = storage.LoadData();
             foreach (var record in loadedRecords)
             {
-                tracker.AddEntry(record, false); 
+                tracker.GetAllRecords().Add(record); 
             }
         }
 
@@ -38,7 +41,8 @@ namespace PowerUsageApp
                 Console.WriteLine("3. Set Energy Goals");
                 Console.WriteLine("4. View Recommendations");
                 Console.WriteLine("5. View Energy Goals");
-                Console.WriteLine("6. Exit");
+                Console.WriteLine("6. Delete Energy goal");
+                Console.WriteLine("7. Exit");
                 Console.Write("Enter your choice: ");
 
                 string input = Console.ReadLine();
@@ -73,6 +77,9 @@ namespace PowerUsageApp
                     ViewEnergyGoals();
                     break;
                 case 6:
+                    DeleteEnergyGoal();
+                    break;
+                case 7:
                     ExitApplication();
                     break;
                 default:
@@ -108,36 +115,19 @@ namespace PowerUsageApp
                 return;
             }
 
-            // Debugging check: Print tracker instance
-            Console.WriteLine($"Debug: tracker is {(tracker == null ? "NULL" : "OK")}");
-
             EnergyData data = new EnergyData(date, usage, cost);
             tracker.AddEntry(data);
 
-            // Debugging check: Print storage instance
-            Console.WriteLine($"Debug: storage is {(storage == null ? "NULL" : "OK")}");
-
-            // Retrieve all records before saving
-            List<EnergyData> allRecords = tracker.GetAllRecords();
-
-            // Debugging check: Print allRecords instance
-            Console.WriteLine($"Debug: allRecords is {(allRecords == null ? "NULL" : $"OK ({allRecords.Count} records)")}");
-
-            if (storage == null)
+            
+            foreach (var goal in goalManager.Goals)
             {
-                Console.WriteLine("Error: storage is null. Cannot save data.");
-                return;
+                goal.TrackUsage(data.Usage, data.Date); 
             }
 
-            if (allRecords == null)
-            {
-                Console.WriteLine("Error: allRecords is null.");
-                return;
-            }
+            goalManager.SaveGoals(); 
+            storage.SaveData(tracker.GetAllRecords());
 
-            // Save data after confirming storage is initialized
-            storage.SaveData(allRecords);
-            Console.WriteLine("Energy data saved successfully!");
+            Console.WriteLine("✅ Energy data entry successfully added.");
         }
 
         private void ViewInsights()
@@ -197,7 +187,8 @@ namespace PowerUsageApp
             Console.WriteLine("Your Energy Goals Progress");
             Console.WriteLine("================================");
 
-            if (goalManager.ReductionGoal <= 0)
+            
+            if (goalManager == null || goalManager.Goals == null || goalManager.Goals.Count == 0)
             {
                 Console.WriteLine("No active goals set. Please create an energy goal first.");
                 return;
@@ -205,23 +196,58 @@ namespace PowerUsageApp
 
             goalManager.DisplayGoals();
 
-            List<EnergyData> allRecords = tracker.GetAllRecords();
-
-            Console.WriteLine($"ℹ Found {allRecords.Count} records. Checking against goal period...");
             
-            foreach (var record in allRecords)
+            if (tracker == null)
             {
-                goalManager.TrackUsage(record.Usage, record.Date); 
+                Console.WriteLine("⚠ Energy tracker not initialized. Unable to fetch records.");
+                return;
             }
 
-            double baselineUsage = allRecords.Count > 0 ? allRecords.Average(r => r.Usage) : 0;
+            List<EnergyData> allRecords = tracker.GetAllRecords();
 
-            double progress = goalManager.CalculateProgress(baselineUsage);
-            bool isAchieved = goalManager.IsGoalAchieved(baselineUsage);
+            
+            if (allRecords == null || allRecords.Count == 0)
+            {
+                Console.WriteLine("⚠ No energy records available to calculate progress.");
+                return;
+            }
 
-            Console.WriteLine($"Progress toward goal: {progress:F2}% achieved.");
-            Console.WriteLine(isAchieved ? "🎉 Congratulations! You have achieved your energy reduction goal." : "⚡ Keep going! You’re making progress.");
-        }    
+            foreach (var goal in goalManager.Goals)
+            {
+                Console.WriteLine($"📅 Period: {goal.GoalStartDate.ToShortDateString()} → {goal.GoalEndDate.ToShortDateString()}");
+
+                
+                List<EnergyData> relevantRecords = allRecords.Where(r => r.Date < goal.GoalStartDate).ToList();
+                double baselineUsage = relevantRecords.Count > 0 ? relevantRecords.Average(r => r.Usage) : 0;
+
+                if (baselineUsage == 0)
+                {
+                    Console.WriteLine("⚠ No valid historical baseline found. Progress cannot be calculated.");
+                    continue;
+                }
+
+                
+                foreach (var record in allRecords)
+                {
+                    goal.TrackUsage(record.Usage, record.Date);
+                }
+
+                Console.WriteLine($"⚡ Energy Usage Tracked: {goal.TotalEnergyUsageDuringGoal} kWh");
+
+                double progress = goal.CalculateProgress(baselineUsage);
+
+                
+                if (goal.TotalEnergyUsageDuringGoal > baselineUsage)
+                {
+                    Console.WriteLine("⚠ Energy usage has increased—goal not achieved!");
+                }
+                else
+                {
+                    Console.WriteLine($"Progress toward goal: {progress:F2}% achieved.");
+                    Console.WriteLine(progress >= goal.ReductionGoal ? "🎉 Goal achieved!" : "⚡ Keep going! You’re making progress.");
+                }
+            }
+        }
     
 
         private void ViewRecommendations()
@@ -258,6 +284,20 @@ namespace PowerUsageApp
                 Console.WriteLine("Invalid choice. Please try again.");
             }
         }
+
+            public void DeleteEnergyGoal()
+            {
+                Console.Write("🗑 Enter the end date of the goal to delete (MM/DD/YYYY): ");
+                if (DateTime.TryParse(Console.ReadLine(), out DateTime targetDate))
+                {
+                    goalManager.DeleteGoal(targetDate);
+                }
+                else
+                {
+                    Console.WriteLine("❌ Invalid date format. Please enter a valid date.");
+                }
+            }
+
 
             private void ExitApplication()
             {
