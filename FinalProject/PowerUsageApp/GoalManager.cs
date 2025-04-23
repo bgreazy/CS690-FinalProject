@@ -3,13 +3,11 @@ using System;
 namespace PowerUsageApp
 {
     public class GoalManager
-    {
-        
+    {        
         public double ReductionGoal { get; private set; } 
         public DateTime GoalStartDate { get; private set; }
         public DateTime GoalEndDate { get; private set; } 
         private double TotalEnergyUsageDuringGoal { get; set; }
-
         
         public void SetGoal(double reductionGoal, DateTime startDate, DateTime endDate)
         {
@@ -58,7 +56,6 @@ namespace PowerUsageApp
 
             return reductionAchieved;
         }
-
         
         public bool IsGoalAchieved(double baselineUsage)
         {
@@ -82,7 +79,6 @@ namespace PowerUsageApp
             Console.WriteLine($"Period: {GoalStartDate.ToShortDateString()} to {GoalEndDate.ToShortDateString()}");
             //Console.WriteLine($" Energy Usage Tracked: {TotalEnergyUsageDuringGoal} kWh");
             Console.WriteLine("--------------------------------");
-
 
         }
     }

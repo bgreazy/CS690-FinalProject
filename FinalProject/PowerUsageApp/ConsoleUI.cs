@@ -221,8 +221,8 @@ namespace PowerUsageApp
 
             Console.WriteLine($"Progress toward goal: {progress:F2}% achieved.");
             Console.WriteLine(isAchieved ? "🎉 Congratulations! You have achieved your energy reduction goal." : "⚡ Keep going! You’re making progress.");
-            
-    }
+        }    
+    
 
         private void ViewRecommendations()
         {
@@ -241,30 +241,28 @@ namespace PowerUsageApp
             else if (choice == 2)
             {
         
-        List<EnergyData> allRecords = tracker.GetAllRecords();
+                List<EnergyData> allRecords = tracker.GetAllRecords();
 
-        if (allRecords.Count > 0)
-        {
-            EnergyData recentData = allRecords.Last(); 
-
-            
-            engine.DisplayCustomTips(recentData);
-        }
-        else
-        {
-            Console.WriteLine("No energy data found. Please add records to receive custom recommendations.");
-        }
-    }
-    else
-    {
-        Console.WriteLine("Invalid choice. Please try again.");
-    }
+                if (allRecords.Count > 0)
+                {
+                    EnergyData recentData = allRecords.Last();                
+                    engine.DisplayCustomTips(recentData);
+                }
+                else
+                {
+                    Console.WriteLine("No energy data found. Please add records to receive custom recommendations.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice. Please try again.");
+            }
         }
 
-        private void ExitApplication()
-        {
-            Console.WriteLine("Thank you for using the Power Usage Application. Goodbye!");
-            Environment.Exit(0);
-        }
+            private void ExitApplication()
+            {
+                Console.WriteLine("Thank you for using the Power Usage Application. Goodbye!");
+                Environment.Exit(0);
+            }
     }
 }
