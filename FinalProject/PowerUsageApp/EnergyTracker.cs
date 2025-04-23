@@ -10,27 +10,47 @@ namespace PowerUsageApp
     {        
         private List<EnergyData> Records;
         private DataStorage storage;
-        private string filePath; 
+        private readonly string filePath; 
 
         public EnergyTracker(string filePath)
         {
-            this.filePath = filePath; 
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new ArgumentNullException(nameof(filePath), "File path cannot be empty.");
+            }
+
+            this.filePath = filePath;
             storage = new DataStorage(filePath);
+
+            Console.WriteLine("🔍 DEBUG: Clearing records before loading new ones");
             
             
-            Records = LoadData();
+            if (Records == null || Records.Count == 0) 
+            {
+                Records = storage.LoadData() ?? new List<EnergyData>();
+            }
+
+            Console.WriteLine($"🔍 DEBUG: Records initialized ({Records.Count} entries).");
         }
 
         public void AddEntry(EnergyData data, bool showMessage = true)
         {
-            Records.Add(data);
-            
-            if (showMessage)
+            Console.WriteLine("🔍 DEBUG: Checking for duplicates before adding entry");
+
+            if (Records.Any(r => r.Date == data.Date && r.Usage == data.Usage && r.Cost == data.Cost))
             {
-                Console.WriteLine("✅ Energy data entry successfully added."); 
+                Console.WriteLine("⚠ Duplicate entry detected. Skipping save.");
+                return;
             }
 
-            SaveEnergyData(); 
+            Records.Add(data);
+
+            if (showMessage)
+            {
+                Console.WriteLine("✅ Energy data entry successfully added.");
+            }
+
+            
         }
 
         public void SaveEnergyData()
@@ -50,16 +70,24 @@ namespace PowerUsageApp
             if (!File.Exists(filePath))
             {
                 Console.WriteLine("ℹ No saved energy data found.");
-                return new List<EnergyData>(); 
+                return new List<EnergyData>();  
             }
 
             try
             {
                 string json = File.ReadAllText(filePath);
-                var records = JsonSerializer.Deserialize<List<EnergyData>>(json) ?? new List<EnergyData>();
 
-                Console.WriteLine("✅ Energy data loaded successfully.");
-                return records;
+                if (string.IsNullOrWhiteSpace(json))
+                {
+                    Console.WriteLine("⚠ Warning: File is empty. Starting with a fresh record list.");
+                    return new List<EnergyData>();
+                }
+
+                var loadedRecords = JsonSerializer.Deserialize<List<EnergyData>>(json) ?? new List<EnergyData>();
+
+                Console.WriteLine($"✅ Loaded {loadedRecords.Count} records from storage.");
+
+                return loadedRecords;
             }
             catch (Exception ex)
             {

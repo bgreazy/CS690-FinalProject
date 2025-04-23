@@ -14,19 +14,14 @@ namespace PowerUsageApp
 
         public Menu(GoalManager goalManager)
         {
-            this.goalManager = goalManager;
+            this.goalManager = goalManager ?? throw new ArgumentNullException(nameof(goalManager)); 
 
             string filePath = "energyData.json";  
-            tracker = new EnergyTracker(filePath); 
+            tracker = new EnergyTracker(filePath) ?? throw new ArgumentNullException(nameof(tracker)); 
 
-            DataStorage storage = new DataStorage(filePath);
+            storage = new DataStorage(filePath) ?? throw new ArgumentNullException(nameof(storage)); 
+
             
-            
-            List<EnergyData> loadedRecords = storage.LoadData();
-            foreach (var record in loadedRecords)
-            {
-                tracker.GetAllRecords().Add(record); 
-            }
         }
 
         public void DisplayMenu()
@@ -45,7 +40,13 @@ namespace PowerUsageApp
                 Console.WriteLine("7. Exit");
                 Console.Write("Enter your choice: ");
 
-                string input = Console.ReadLine();
+                string? input = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(input)) 
+                {
+                    Console.WriteLine("Invalid input. Please enter a number between 1 and 6.");
+                    return;
+                }
+
                 if (int.TryParse(input, out int choice))
                 {
                     HandleMenuSelection(choice);
@@ -94,40 +95,38 @@ namespace PowerUsageApp
             Console.WriteLine("Add Energy Data");
             Console.WriteLine("================================");
 
+            if (tracker == null)
+            {
+                Console.WriteLine("❌ Error: Energy tracker not initialized.");
+                return;
+            }
+
             Console.Write("Enter the date (yyyy-MM-dd): ");
             if (!DateTime.TryParse(Console.ReadLine(), out DateTime date))
             {
-                Console.WriteLine("Invalid date format. Please enter a valid date (yyyy-MM-dd).");
+                Console.WriteLine("❌ Invalid date format.");
                 return;
             }
 
             Console.Write("Enter energy usage (kWh): ");
             if (!double.TryParse(Console.ReadLine(), out double usage) || usage <= 0)
             {
-                Console.WriteLine("Invalid input. Please enter a positive numeric value for usage.");
+                Console.WriteLine("❌ Invalid input.");
                 return;
             }
 
             Console.Write("Enter cost per kWh ($): ");
             if (!double.TryParse(Console.ReadLine(), out double cost) || cost <= 0)
             {
-                Console.WriteLine("Invalid input. Please enter a positive numeric value.");
+                Console.WriteLine("❌ Invalid input.");
                 return;
             }
 
             EnergyData data = new EnergyData(date, usage, cost);
-            tracker.AddEntry(data);
 
-            
-            foreach (var goal in goalManager.Goals)
-            {
-                goal.TrackUsage(data.Usage, data.Date); 
-            }
+            tracker.AddEntry(data); 
 
-            goalManager.SaveGoals(); 
-            storage.SaveData(tracker.GetAllRecords());
-
-            Console.WriteLine("✅ Energy data entry successfully added.");
+            tracker.SaveEnergyData(); 
         }
 
         private void ViewInsights()
@@ -258,7 +257,22 @@ namespace PowerUsageApp
             Console.WriteLine("1. General Tips");
             Console.WriteLine("2. Custom Tips");
             Console.Write("Enter your choice: ");
-            int choice = int.Parse(Console.ReadLine());
+
+            string? input = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                Console.WriteLine("❌ Invalid input. Please enter a number.");
+                return;
+            }
+
+            if (!int.TryParse(input, out int choice))
+            {
+                Console.WriteLine("❌ Invalid number format. Please enter a valid number.");
+                return;
+            }
+
+            
+            HandleMenuSelection(choice);
 
             if (choice == 1)
             {
