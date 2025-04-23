@@ -4,7 +4,10 @@
     {
         public static void Main(string[] args)
         {
-            Menu menu = new Menu();
+            GoalManager goalManager = new GoalManager("goals.json"); 
+            List<EnergyGoal> activeGoals = goalManager.Goals;
+
+            Menu menu = new Menu(goalManager);
             
             while (true) 
             {
