@@ -20,12 +20,9 @@ namespace PowerUsageApp
 
             // Load existing data into tracker
             List<EnergyData> loadedRecords = storage.LoadData();
-            if (loadedRecords != null)
+            foreach (var record in loadedRecords)
             {
-                foreach (var record in loadedRecords)
-                {
-                    tracker.AddEntry(record);
-                }
+                tracker.AddEntry(record, false); 
             }
         }
 
@@ -40,7 +37,8 @@ namespace PowerUsageApp
                 Console.WriteLine("2. View Insights");
                 Console.WriteLine("3. Set Energy Goals");
                 Console.WriteLine("4. View Recommendations");
-                Console.WriteLine("5. Exit");
+                Console.WriteLine("5. View Energy Goals");
+                Console.WriteLine("6. Exit");
                 Console.Write("Enter your choice: ");
 
                 string input = Console.ReadLine();
@@ -50,12 +48,12 @@ namespace PowerUsageApp
                 }
                 else
                 {
-                    Console.WriteLine("Invalid input. Please enter a number between 1 and 5.");
+                    Console.WriteLine("Invalid input. Please enter a number between 1 and 6.");
                 }
             }
         }
 
-        private void HandleMenuSelection(int choice)
+        public void HandleMenuSelection(int choice)
         {
             switch (choice)
             {
@@ -72,6 +70,9 @@ namespace PowerUsageApp
                     ViewRecommendations();
                     break;
                 case 5:
+                    ViewEnergyGoals();
+                    break;
+                case 6:
                     ExitApplication();
                     break;
                 default:
@@ -144,8 +145,8 @@ namespace PowerUsageApp
             Console.WriteLine("================================");
             Console.WriteLine("View Insights");
             Console.WriteLine("================================");
-            // Implement logic to retrieve and display insights using EnergyTracker
-            tracker.DisplayInsights(); // Placeholder method
+            
+            tracker.DisplayInsights(); 
             
         }
 
@@ -154,16 +155,74 @@ namespace PowerUsageApp
             Console.WriteLine("================================");
             Console.WriteLine("Set Energy Goals");
             Console.WriteLine("================================");
-            Console.Write("Enter reduction goal (e.g., 10% or 100 kWh): ");
-            double goal = double.Parse(Console.ReadLine());
-            Console.Write("Enter start date (yyyy-MM-dd): ");
-            DateTime startDate = DateTime.Parse(Console.ReadLine());
-            Console.Write("Enter end date (yyyy-MM-dd): ");
-            DateTime endDate = DateTime.Parse(Console.ReadLine());
 
+            
+            Console.Write("Enter reduction goal (e.g., 10% or 100 kWh): ");
+            if (!double.TryParse(Console.ReadLine(), out double goal) || goal <= 0)
+            {
+                Console.WriteLine("Error: Please enter a valid positive goal.");
+                return;
+            }
+
+            Console.Write("Enter start date (yyyy-MM-dd): ");
+            if (!DateTime.TryParse(Console.ReadLine(), out DateTime startDate))
+            {
+                Console.WriteLine("Error: Invalid date format. Use yyyy-MM-dd.");
+                return;
+            }
+
+            Console.Write("Enter end date (yyyy-MM-dd): ");
+            if (!DateTime.TryParse(Console.ReadLine(), out DateTime endDate))
+            {
+                Console.WriteLine("Error: Invalid date format. Use yyyy-MM-dd.");
+                return;
+            }
+
+            if (startDate >= endDate)
+            {
+                Console.WriteLine("Error: Start date must be earlier than the end date.");
+                return;
+            }
+
+            
             goalManager.SetGoal(goal, startDate, endDate);
-            Console.WriteLine("Energy goal set successfully!");
+
+            Console.WriteLine($"Energy goal set successfully!");
+            Console.WriteLine($"Goal: Reduce energy by {goal}% between {startDate.ToShortDateString()} and {endDate.ToShortDateString()}.");
         }
+
+        private void ViewEnergyGoals()
+        {
+            Console.WriteLine("================================");
+            Console.WriteLine("Your Energy Goals Progress");
+            Console.WriteLine("================================");
+
+            if (goalManager.ReductionGoal <= 0)
+            {
+                Console.WriteLine("No active goals set. Please create an energy goal first.");
+                return;
+            }
+
+            goalManager.DisplayGoals();
+
+            List<EnergyData> allRecords = tracker.GetAllRecords();
+
+            Console.WriteLine($"ℹ Found {allRecords.Count} records. Checking against goal period...");
+            
+            foreach (var record in allRecords)
+            {
+                goalManager.TrackUsage(record.Usage, record.Date); 
+            }
+
+            double baselineUsage = allRecords.Count > 0 ? allRecords.Average(r => r.Usage) : 0;
+
+            double progress = goalManager.CalculateProgress(baselineUsage);
+            bool isAchieved = goalManager.IsGoalAchieved(baselineUsage);
+
+            Console.WriteLine($"Progress toward goal: {progress:F2}% achieved.");
+            Console.WriteLine(isAchieved ? "🎉 Congratulations! You have achieved your energy reduction goal." : "⚡ Keep going! You’re making progress.");
+            
+    }
 
         private void ViewRecommendations()
         {
@@ -177,17 +236,29 @@ namespace PowerUsageApp
 
             if (choice == 1)
             {
-                engine.DisplayGeneralTips(); // Placeholder method
+                engine.DisplayGeneralTips(); 
             }
             else if (choice == 2)
             {
-                EnergyData recentData = new EnergyData(DateTime.Now, 30.0, 100.0); // Replace with real data
-                engine.DisplayCustomTips(recentData);
-            }
-            else
-            {
-                Console.WriteLine("Invalid choice. Please try again.");
-            }
+        
+        List<EnergyData> allRecords = tracker.GetAllRecords();
+
+        if (allRecords.Count > 0)
+        {
+            EnergyData recentData = allRecords.Last(); 
+
+            
+            engine.DisplayCustomTips(recentData);
+        }
+        else
+        {
+            Console.WriteLine("No energy data found. Please add records to receive custom recommendations.");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Invalid choice. Please try again.");
+    }
         }
 
         private void ExitApplication()

@@ -2,19 +2,30 @@
 {
     class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            // // Display a welcome message
-            // Console.WriteLine("================================");
-            // Console.WriteLine("Welcome to the Power Usage Application!");
-            // Console.WriteLine("================================");
-
-            // Initialize and display the main menu
             Menu menu = new Menu();
-            menu.DisplayMenu();
+            
+            while (true) 
+            {
+                menu.DisplayMenu();
+                
+                Console.Write("Enter your choice: ");
+                if (int.TryParse(Console.ReadLine(), out int choice))
+                {
+                    if (choice == 7) 
+                    {
+                        Console.WriteLine("Thank you for using the Power Usage Application. Goodbye!");
+                        break;
+                    }
 
-            // End of program
-            //Console.WriteLine("Thank you for using the Power Usage test Application. Goodbye!");
+                    menu.HandleMenuSelection(choice);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter a valid number.");
+                }
+            }
         }
     }
 }
