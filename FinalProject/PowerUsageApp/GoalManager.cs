@@ -54,7 +54,7 @@ namespace PowerUsageApp
 
             string json = JsonSerializer.Serialize(Goals, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(FilePath, json);
-            Console.WriteLine("✅ Goals saved successfully.");
+            //Console.WriteLine("✅ Goals saved successfully.");
         }
 
         public void SetGoal(double reductionGoal, DateTime startDate, DateTime endDate)
@@ -69,10 +69,10 @@ namespace PowerUsageApp
             Goals.Add(newGoal);
 
             SaveGoals();
-            Console.WriteLine($"🎯 Goal set: Reduce energy by {newGoal.ReductionGoal}% from {newGoal.GoalStartDate.ToShortDateString()} to {newGoal.GoalEndDate.ToShortDateString()}.");
+            //Console.WriteLine($"🎯 Goal set: Reduce energy by {newGoal.ReductionGoal}% from {newGoal.GoalStartDate.ToShortDateString()} to {newGoal.GoalEndDate.ToShortDateString()}.");
         }
 
-        public void DeleteGoal(DateTime targetDate)
+        public bool DeleteGoal(DateTime targetDate)
         {
             var goalToRemove = Goals.FirstOrDefault(g => g.GoalEndDate.Date == targetDate.Date);
 
@@ -80,19 +80,19 @@ namespace PowerUsageApp
             {
                 Goals.Remove(goalToRemove);
                 SaveGoals(); 
-                Console.WriteLine($"🗑 Goal for {targetDate.ToShortDateString()} removed successfully.");
+                Console.WriteLine($"🗑 Goal for {targetDate:yyyy-MM-dd} removed successfully.");
+                return true; // ✅ Return success
             }
-            else
-            {
-                Console.WriteLine($"❌ No goal found for {targetDate.ToShortDateString()}.");
-            }
+            
+            Console.WriteLine($"❌ No goal found for {targetDate:yyyy-MM-dd}.");
+            return false; // ✅ Return failure
         }
 
         public void DisplayGoals()
         {
-            Console.WriteLine("================================");
-            Console.WriteLine("Your Active Energy Goals");
-            Console.WriteLine("================================");
+            // Console.WriteLine("================================");
+            // Console.WriteLine("Your Active Energy Goals");
+            // Console.WriteLine("================================");
 
             Goals = LoadGoals();
 
@@ -102,16 +102,16 @@ namespace PowerUsageApp
                 return;
             }
 
-            foreach (var goal in Goals)
-            {
-                Console.WriteLine($"🎯 Goal: Reduce energy by {goal.ReductionGoal}%");
-                //Console.WriteLine($"📅 Period: {goal.GoalStartDate.ToShortDateString()} → {goal.GoalEndDate.ToShortDateString()}");
+            // foreach (var goal in Goals)
+            // {
+            //     Console.WriteLine($"🎯 Goal: Reduce energy by {goal.ReductionGoal}%");
+            //     //Console.WriteLine($"📅 Period: {goal.GoalStartDate.ToShortDateString()} → {goal.GoalEndDate.ToShortDateString()}");
 
-                double totalTrackedUsage = goal.TotalEnergyUsageDuringGoal;
-                //Console.WriteLine($"⚡ Energy Usage Tracked: {totalTrackedUsage} kWh");
+            //     double totalTrackedUsage = goal.TotalEnergyUsageDuringGoal;
+            //     //Console.WriteLine($"⚡ Energy Usage Tracked: {totalTrackedUsage} kWh");
 
-                Console.WriteLine("--------------------------------");
-            }
+            //     Console.WriteLine("--------------------------------");
+            // }
         }
     }
 }

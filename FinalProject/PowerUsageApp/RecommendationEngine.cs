@@ -7,9 +7,9 @@ namespace PowerUsageApp
     {        
         public void DisplayGeneralTips()
         {
-            Console.WriteLine("================================");
-            Console.WriteLine("General Energy-Saving Tips");
-            Console.WriteLine("================================");
+            // Console.WriteLine("================================");
+            // Console.WriteLine("General Energy-Saving Tips");
+            // Console.WriteLine("================================");
             List<string> tips = GetGeneralTips();
 
             foreach (string tip in tips)
@@ -20,9 +20,9 @@ namespace PowerUsageApp
         
         public void DisplayCustomTips(EnergyData recentData)
         {
-            Console.WriteLine("================================");
-            Console.WriteLine("Custom Recommendations");
-            Console.WriteLine("================================");
+            // Console.WriteLine("================================");
+            // Console.WriteLine("Custom Recommendations");
+            // Console.WriteLine("================================");
 
             List<string> customTips = GetCustomTips(recentData);
 
