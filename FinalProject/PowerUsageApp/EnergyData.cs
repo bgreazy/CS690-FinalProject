@@ -1,5 +1,3 @@
-using System;
-
 namespace PowerUsageApp
 {
     public class EnergyData
