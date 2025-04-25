@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Text.Json;
+using Spectre.Console;
 
 namespace PowerUsageApp
 {
@@ -49,7 +50,6 @@ namespace PowerUsageApp
             {
                 Console.WriteLine("✅ Energy data entry successfully added.");
             }
-
             
         }
 
@@ -111,24 +111,94 @@ namespace PowerUsageApp
             return totalUsage;
         }
 
+
+
         public void DisplayInsights()
         {
-            Console.WriteLine("================================");
-            Console.WriteLine("📊 Insights:");
-            Console.WriteLine("================================");
+            AnsiConsole.WriteLine();
+            AnsiConsole.Markup("[bold cyan]📊 Energy Usage Insights[/]\n");
+            AnsiConsole.WriteLine("==============================");
 
-            Console.WriteLine($"📌 Number of records: {Records.Count}");
+            var table = new Table();
+            table.AddColumn("📅 Date");
+            table.AddColumn("⚡ Usage");
+            table.AddColumn("💲 Cost");
+            table.AddColumn("📈 Total");
 
             foreach (var record in Records)
             {
                 double total = record.Usage * record.Cost;
-                Console.WriteLine($"📅 Date: {record.Date.ToShortDateString()}, ⚡ Usage: {record.Usage} kWh, 💲 Cost: ${record.Cost:F2}, 📈 Total: ${total:F2}");
+                table.AddRow(
+                    record.Date.ToString("yyyy-MM-dd"),
+                    $"{record.Usage} kWh",
+                    $"${record.Cost:F2}",
+                    $"${total:F2}"
+                );
             }
+
+            AnsiConsole.Write(table);
         }
+
+        // public void DisplayInsights()
+        // {
+        //     Console.WriteLine("================================");
+        //     Console.WriteLine("📊 Insights:");
+        //     Console.WriteLine("================================");
+
+        //     Console.WriteLine($"📌 Number of records: {Records.Count}");
+
+        //     foreach (var record in Records)
+        //     {
+        //         double total = record.Usage * record.Cost;
+        //         Console.WriteLine($"📅 Date: {record.Date.ToShortDateString()}, ⚡ Usage: {record.Usage} kWh, 💲 Cost: ${record.Cost:F2}, 📈 Total: ${total:F2}");
+        //     }
+        // }
 
         public List<EnergyData> GetAllRecords()
         {
-            return Records;
+            return Records ?? new List<EnergyData>();
         }
+
+        public void DeleteEnergyData()
+        {
+            if (this.GetAllRecords().Count == 0)
+            {
+                AnsiConsole.Markup("[yellow]⚠ No energy records available for deletion.[/]\n");
+                return;
+            }
+
+            AnsiConsole.Markup("[bold red]🗑 Delete Energy Data[/]\n");
+            AnsiConsole.WriteLine("==============================");
+
+            var records = this.GetAllRecords(); // ✅ No need for `tracker`
+
+            // ✅ Create formatted choices for selection
+            var recordChoices = records.Select(r => $"{r.Date:yyyy-MM-dd} | {r.Usage} kWh | ${r.Cost:F2}").ToList();
+
+            // ✅ Prompt user to select an entry for deletion
+            var selectedRecord = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("[bold]Select an energy entry to delete:[/]")
+                    .AddChoices(recordChoices)
+            );
+
+            // ✅ Extract date from selection and remove the record
+            DateTime targetDate = DateTime.Parse(selectedRecord.Split('|')[0].Trim());
+            var recordToRemove = records.FirstOrDefault(r => r.Date == targetDate);
+
+            if (recordToRemove != null)
+            {
+                records.Remove(recordToRemove);
+                this.SaveEnergyData(); // ✅ Use `this` instead of `tracker`
+
+                AnsiConsole.Markup("[green]✅ Energy data entry deleted successfully.[/]\n");
+            }
+            else
+            {
+                AnsiConsole.Markup("[yellow]⚠ No matching record found.[/]\n");
+            }
+        }
+
+        
     }
 }
