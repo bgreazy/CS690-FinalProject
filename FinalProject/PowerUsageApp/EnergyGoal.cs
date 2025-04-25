@@ -1,4 +1,3 @@
-using System;
 using System.Text.Json.Serialization;
 
     public class EnergyGoal
@@ -46,7 +45,6 @@ using System.Text.Json.Serialization;
                 return -1;
             }
 
-            Console.WriteLine($"🔍 Debug: Baseline Usage = {baselineUsage}, Tracked Energy = {TotalEnergyUsageDuringGoal}");
 
             if (TotalEnergyUsageDuringGoal > baselineUsage)
             {

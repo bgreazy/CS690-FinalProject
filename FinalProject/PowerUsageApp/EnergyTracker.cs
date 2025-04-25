@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
 using System.Text.Json;
 using Spectre.Console;
 
@@ -22,8 +18,6 @@ namespace PowerUsageApp
 
             this.filePath = filePath;
             storage = new DataStorage(filePath);
-
-            Console.WriteLine("🔍 DEBUG: Clearing records before loading new ones");
             
             
             if (Records == null || Records.Count == 0) 
@@ -31,12 +25,11 @@ namespace PowerUsageApp
                 Records = storage.LoadData() ?? new List<EnergyData>();
             }
 
-            Console.WriteLine($"🔍 DEBUG: Records initialized ({Records.Count} entries).");
         }
 
         public void AddEntry(EnergyData data, bool showMessage = true)
         {
-            Console.WriteLine("🔍 DEBUG: Checking for duplicates before adding entry");
+            // Console.WriteLine("🔍 DEBUG: Checking for duplicates before adding entry");
 
             if (Records.Any(r => r.Date == data.Date && r.Usage == data.Usage && r.Cost == data.Cost))
             {
@@ -44,28 +37,18 @@ namespace PowerUsageApp
                 return;
             }
 
-            Records.Add(data);
-
-            if (showMessage)
-            {
-                Console.WriteLine("✅ Energy data entry successfully added.");
-            }
-            
+            Records.Add(data);            
         }
 
         public void SaveEnergyData()
         {
-            var stackTrace = Environment.StackTrace;
-            Console.WriteLine("🔍 DEBUG: SaveEnergyData() called from:");
-            Console.WriteLine(stackTrace);
-
             storage.SaveData(Records);
             Console.WriteLine("✅ Energy data saved successfully.");
         }
 
         public List<EnergyData> LoadData()
         {
-            Console.WriteLine("🔍 DEBUG: LoadData() called");
+            
 
             if (!File.Exists(filePath))
             {
@@ -139,20 +122,6 @@ namespace PowerUsageApp
             AnsiConsole.Write(table);
         }
 
-        // public void DisplayInsights()
-        // {
-        //     Console.WriteLine("================================");
-        //     Console.WriteLine("📊 Insights:");
-        //     Console.WriteLine("================================");
-
-        //     Console.WriteLine($"📌 Number of records: {Records.Count}");
-
-        //     foreach (var record in Records)
-        //     {
-        //         double total = record.Usage * record.Cost;
-        //         Console.WriteLine($"📅 Date: {record.Date.ToShortDateString()}, ⚡ Usage: {record.Usage} kWh, 💲 Cost: ${record.Cost:F2}, 📈 Total: ${total:F2}");
-        //     }
-        // }
 
         public List<EnergyData> GetAllRecords()
         {

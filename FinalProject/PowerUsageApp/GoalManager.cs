@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text.Json;
 
 namespace PowerUsageApp
@@ -33,10 +30,6 @@ namespace PowerUsageApp
                     PropertyNameCaseInsensitive = true
                 }) ?? new List<EnergyGoal>();
 
-                // foreach (var goal in goals)
-                // {
-                //     goal.LoadTrackedProgress(); 
-                // }
 
                 Console.WriteLine("✅ Goals loaded successfully.");
                 return goals;
@@ -69,7 +62,7 @@ namespace PowerUsageApp
             Goals.Add(newGoal);
 
             SaveGoals();
-            //Console.WriteLine($"🎯 Goal set: Reduce energy by {newGoal.ReductionGoal}% from {newGoal.GoalStartDate.ToShortDateString()} to {newGoal.GoalEndDate.ToShortDateString()}.");
+            
         }
 
         public bool DeleteGoal(DateTime targetDate)
@@ -90,9 +83,6 @@ namespace PowerUsageApp
 
         public void DisplayGoals()
         {
-            // Console.WriteLine("================================");
-            // Console.WriteLine("Your Active Energy Goals");
-            // Console.WriteLine("================================");
 
             Goals = LoadGoals();
 
@@ -102,16 +92,6 @@ namespace PowerUsageApp
                 return;
             }
 
-            // foreach (var goal in Goals)
-            // {
-            //     Console.WriteLine($"🎯 Goal: Reduce energy by {goal.ReductionGoal}%");
-            //     //Console.WriteLine($"📅 Period: {goal.GoalStartDate.ToShortDateString()} → {goal.GoalEndDate.ToShortDateString()}");
-
-            //     double totalTrackedUsage = goal.TotalEnergyUsageDuringGoal;
-            //     //Console.WriteLine($"⚡ Energy Usage Tracked: {totalTrackedUsage} kWh");
-
-            //     Console.WriteLine("--------------------------------");
-            // }
         }
     }
 }

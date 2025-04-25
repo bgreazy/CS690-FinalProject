@@ -1,4 +1,3 @@
-using System;
 using Spectre.Console;
 
 namespace PowerUsageApp
@@ -40,39 +39,6 @@ namespace PowerUsageApp
             HandleMenuSelection(int.Parse(choice[0].ToString()));
         }
 
-        // public void DisplayMenu()
-        // {
-        //     while (true)
-        //     {
-        //         Console.WriteLine("================================");
-        //         Console.WriteLine("Welcome to Power Usage App");
-        //         Console.WriteLine("================================");
-        //         Console.WriteLine("1. Add Energy Data");
-        //         Console.WriteLine("2. View Insights");
-        //         Console.WriteLine("3. Set Energy Goals");
-        //         Console.WriteLine("4. View Recommendations");
-        //         Console.WriteLine("5. View Energy Goals");
-        //         Console.WriteLine("6. Delete Energy goal");
-        //         Console.WriteLine("7. Exit");
-        //         Console.Write("Enter your choice: ");
-
-        //         string? input = Console.ReadLine();
-        //         if (string.IsNullOrWhiteSpace(input)) 
-        //         {
-        //             Console.WriteLine("Invalid input. Please enter a number between 1 and 6.");
-        //             return;
-        //         }
-
-        //         if (int.TryParse(input, out int choice))
-        //         {
-        //             HandleMenuSelection(choice);
-        //         }
-        //         else
-        //         {
-        //             Console.WriteLine("Invalid input. Please enter a number between 1 and 6.");
-        //         }
-        //     }
-        // }
 
         public void HandleMenuSelection(int choice)
         {
@@ -109,46 +75,7 @@ namespace PowerUsageApp
             DisplayMenu();
         }
 
-        // private void AddEnergyData()
-        // {
-        //     Console.WriteLine("================================");
-        //     Console.WriteLine("Add Energy Data");
-        //     Console.WriteLine("================================");
 
-        //     if (tracker == null)
-        //     {
-        //         Console.WriteLine("❌ Error: Energy tracker not initialized.");
-        //         return;
-        //     }
-
-        //     Console.Write("Enter the date (yyyy-MM-dd): ");
-        //     if (!DateTime.TryParse(Console.ReadLine(), out DateTime date))
-        //     {
-        //         Console.WriteLine("❌ Invalid date format.");
-        //         return;
-        //     }
-
-        //     Console.Write("Enter energy usage (kWh): ");
-        //     if (!double.TryParse(Console.ReadLine(), out double usage) || usage <= 0)
-        //     {
-        //         Console.WriteLine("❌ Invalid input.");
-        //         return;
-        //     }
-
-        //     Console.Write("Enter cost per kWh ($): ");
-        //     if (!double.TryParse(Console.ReadLine(), out double cost) || cost <= 0)
-        //     {
-        //         Console.WriteLine("❌ Invalid input.");
-        //         return;
-        //     }
-
-        //     EnergyData data = new EnergyData(date, usage, cost);
-
-        //     tracker.AddEntry(data); 
-
-        //     tracker.SaveEnergyData(); 
-        // }
-        
 
         private void AddEnergyData()
         {
@@ -190,55 +117,11 @@ namespace PowerUsageApp
         }
 
         private void ViewInsights()
-        {
-            // Console.WriteLine("================================");
-            // Console.WriteLine("View Insights");
-            // Console.WriteLine("================================");
+        {         
             
             tracker.DisplayInsights(); 
             
-        }
-
-        // private void SetEnergyGoals()
-        // {
-        //     Console.WriteLine("================================");
-        //     Console.WriteLine("Set Energy Goals");
-        //     Console.WriteLine("================================");
-
-            
-        //     Console.Write("Enter reduction goal (e.g., 10% or 100 kWh): ");
-        //     if (!double.TryParse(Console.ReadLine(), out double goal) || goal <= 0)
-        //     {
-        //         Console.WriteLine("Error: Please enter a valid positive goal.");
-        //         return;
-        //     }
-
-        //     Console.Write("Enter start date (yyyy-MM-dd): ");
-        //     if (!DateTime.TryParse(Console.ReadLine(), out DateTime startDate))
-        //     {
-        //         Console.WriteLine("Error: Invalid date format. Use yyyy-MM-dd.");
-        //         return;
-        //     }
-
-        //     Console.Write("Enter end date (yyyy-MM-dd): ");
-        //     if (!DateTime.TryParse(Console.ReadLine(), out DateTime endDate))
-        //     {
-        //         Console.WriteLine("Error: Invalid date format. Use yyyy-MM-dd.");
-        //         return;
-        //     }
-
-        //     if (startDate >= endDate)
-        //     {
-        //         Console.WriteLine("Error: Start date must be earlier than the end date.");
-        //         return;
-        //     }
-
-            
-        //     goalManager.SetGoal(goal, startDate, endDate);
-
-        //     Console.WriteLine($"Energy goal set successfully!");
-        //     Console.WriteLine($"Goal: Reduce energy by {goal}% between {startDate.ToShortDateString()} and {endDate.ToShortDateString()}.");
-        // }
+        }        
 
         
 
@@ -246,16 +129,14 @@ namespace PowerUsageApp
         {
             AnsiConsole.Markup("[bold cyan]🏆 Set Energy Goals[/]\n");
             AnsiConsole.WriteLine("==============================");
-
-            // ✅ Reduction Goal Input
+            
             var goal = AnsiConsole.Prompt(
                 new TextPrompt<double>("Enter reduction goal (e.g., 10% or 100 kWh):")
                     .Validate(input => input > 0 
                         ? ValidationResult.Success() 
                         : ValidationResult.Error("[red]❌ Error: Please enter a valid positive goal.[/]"))
             );
-
-            // 📅 Start Date Input
+            
             var startDate = AnsiConsole.Prompt(
                 new TextPrompt<DateTime>("Enter start date (yyyy-MM-dd):")
                     .Validate(input => input.Year > 2000 
@@ -263,7 +144,7 @@ namespace PowerUsageApp
                         : ValidationResult.Error("[red]❌ Error: Invalid date format. Use yyyy-MM-dd.[/]"))
             );
 
-            // 📅 End Date Input
+            
             var endDate = AnsiConsole.Prompt(
                 new TextPrompt<DateTime>("Enter end date (yyyy-MM-dd):")
                     .Validate(input => input > startDate 
@@ -276,75 +157,7 @@ namespace PowerUsageApp
             AnsiConsole.Markup($"\n[green]✅ Energy goal set successfully![/]\n");
             AnsiConsole.WriteLine("==============================");
             AnsiConsole.Markup($"[bold]Goal:[/] Reduce energy by [bold yellow]{goal}[/] between [bold blue]{startDate:yyyy-MM-dd}[/] and [bold blue]{endDate:yyyy-MM-dd}[/].\n\n");
-        }
-
-        // private void ViewEnergyGoals()
-        // {
-        //     Console.WriteLine("================================");
-        //     Console.WriteLine("Your Energy Goals Progress");
-        //     Console.WriteLine("================================");
-
-            
-        //     if (goalManager == null || goalManager.Goals == null || goalManager.Goals.Count == 0)
-        //     {
-        //         Console.WriteLine("No active goals set. Please create an energy goal first.");
-        //         return;
-        //     }
-
-        //     goalManager.DisplayGoals();
-
-            
-        //     if (tracker == null)
-        //     {
-        //         Console.WriteLine("⚠ Energy tracker not initialized. Unable to fetch records.");
-        //         return;
-        //     }
-
-        //     List<EnergyData> allRecords = tracker.GetAllRecords();
-
-            
-        //     if (allRecords == null || allRecords.Count == 0)
-        //     {
-        //         Console.WriteLine("⚠ No energy records available to calculate progress.");
-        //         return;
-        //     }
-
-        //     foreach (var goal in goalManager.Goals)
-        //     {
-        //         Console.WriteLine($"📅 Period: {goal.GoalStartDate.ToShortDateString()} → {goal.GoalEndDate.ToShortDateString()}");
-
-                
-        //         List<EnergyData> relevantRecords = allRecords.Where(r => r.Date < goal.GoalStartDate).ToList();
-        //         double baselineUsage = relevantRecords.Count > 0 ? relevantRecords.Average(r => r.Usage) : 0;
-
-        //         if (baselineUsage == 0)
-        //         {
-        //             Console.WriteLine("⚠ No valid historical baseline found. Progress cannot be calculated.");
-        //             continue;
-        //         }
-
-                
-        //         foreach (var record in allRecords)
-        //         {
-        //             goal.TrackUsage(record.Usage, record.Date);
-        //         }
-
-        //         Console.WriteLine($"⚡ Energy Usage Tracked: {goal.TotalEnergyUsageDuringGoal} kWh");
-
-        //         double progress = goal.CalculateProgress(baselineUsage);
-
-                
-        //         if (goal.TotalEnergyUsageDuringGoal > baselineUsage)
-        //         {
-        //             Console.WriteLine("⚠ Energy usage has increased—goal not achieved!");
-        //         }
-        //         else
-        //         {
-        //             Console.WriteLine($"Progress toward goal: {progress:F2}% achieved.");
-        //             Console.WriteLine(progress >= goal.ReductionGoal ? "🎉 Goal achieved!" : "⚡ Keep going! You’re making progress.");
-        //         }
-        //     }
-        // }
+        }        
 
         
 
@@ -416,58 +229,7 @@ namespace PowerUsageApp
             }
 
             AnsiConsole.Write(table);
-        }
-    
-
-        // private void ViewRecommendations()
-        // {
-        //     Console.WriteLine("================================");
-        //     Console.WriteLine("View Recommendations");
-        //     Console.WriteLine("================================");
-        //     Console.WriteLine("1. General Tips");
-        //     Console.WriteLine("2. Custom Tips");
-        //     Console.Write("Enter your choice: ");
-
-        //     string? input = Console.ReadLine();
-        //     if (string.IsNullOrWhiteSpace(input))
-        //     {
-        //         Console.WriteLine("❌ Invalid input. Please enter a number.");
-        //         return;
-        //     }
-
-        //     if (!int.TryParse(input, out int choice))
-        //     {
-        //         Console.WriteLine("❌ Invalid number format. Please enter a valid number.");
-        //         return;
-        //     }
-
-            
-        //     HandleMenuSelection(choice);
-
-        //     if (choice == 1)
-        //     {
-        //         engine.DisplayGeneralTips(); 
-        //     }
-        //     else if (choice == 2)
-        //     {
-        
-        //         List<EnergyData> allRecords = tracker.GetAllRecords();
-
-        //         if (allRecords.Count > 0)
-        //         {
-        //             EnergyData recentData = allRecords.Last();                
-        //             engine.DisplayCustomTips(recentData);
-        //         }
-        //         else
-        //         {
-        //             Console.WriteLine("No energy data found. Please add records to receive custom recommendations.");
-        //         }
-        //     }
-        //     else
-        //     {
-        //         Console.WriteLine("Invalid choice. Please try again.");
-        //     }
-        // }
+        }  
 
 
 
@@ -501,49 +263,8 @@ namespace PowerUsageApp
                 }
             }
 
-            // ✅ Automatically return to main menu after showing recommendations
             DisplayMenu();
         }
-
-
-            // public void DeleteEnergyGoal()
-            // {
-            //     Console.Write("🗑 Enter the end date of the goal to delete (MM/DD/YYYY): ");
-            //     if (DateTime.TryParse(Console.ReadLine(), out DateTime targetDate))
-            //     {
-            //         goalManager.DeleteGoal(targetDate);
-            //     }
-            //     else
-            //     {
-            //         Console.WriteLine("❌ Invalid date format. Please enter a valid date.");
-            //     }
-            // }
-
-
-            // public void DeleteEnergyGoal()
-            // {
-            //     AnsiConsole.Markup("[bold red]🗑 Delete Energy Goal[/]\n");
-            //     AnsiConsole.WriteLine("==============================");
-
-            //     // 📅 Request end date with validation
-            //     var targetDate = AnsiConsole.Prompt(
-            //         new TextPrompt<DateTime>("Enter the end date of the goal to delete (yyyy-MM-dd):")
-            //             .Validate(input => input.Year > 2000 
-            //                 ? ValidationResult.Success() 
-            //                 : ValidationResult.Error("[red]❌ Invalid date format. Please enter a valid date.[/]"))
-            //     );
-
-            //     bool success = goalManager.DeleteGoal(targetDate);
-
-            //     if (success)
-            //     {
-            //         AnsiConsole.Markup("[green]✅ Energy goal deleted successfully![/]\n");
-            //     }
-            //     else
-            //     {
-            //         AnsiConsole.Markup("[yellow]⚠ No goal found matching the provided date.[/]\n");
-            //     }
-            // }
             
 
         public void DeleteEnergyGoal()
@@ -584,9 +305,6 @@ namespace PowerUsageApp
                 AnsiConsole.Markup("[yellow]⚠ No matching goal found.[/]\n");
             }
         }
-
-
-
         
 
             private void ExitApplication()

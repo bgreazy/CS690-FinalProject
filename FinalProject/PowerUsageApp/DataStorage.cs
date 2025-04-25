@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
 using Newtonsoft.Json;
 
 namespace PowerUsageApp
@@ -30,7 +26,6 @@ namespace PowerUsageApp
                     return;
                 }
 
-                Console.WriteLine($"🔍 DEBUG: Saving {records.Count} unique records.");
 
                 
                 string json = Newtonsoft.Json.JsonConvert.SerializeObject(records, Newtonsoft.Json.Formatting.Indented);
@@ -56,7 +51,6 @@ namespace PowerUsageApp
             string json = File.ReadAllText(filePath); 
             List<EnergyData> loadedRecords = JsonConvert.DeserializeObject<List<EnergyData>>(json) ?? new List<EnergyData>(); 
 
-            Console.WriteLine($"🔍 DEBUG: Loaded {loadedRecords.Count} records from storage"); 
 
             return loadedRecords;
         }
